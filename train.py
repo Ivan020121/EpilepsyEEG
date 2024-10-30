@@ -13,7 +13,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--window", type=int, default=10, help="Window size")
     parser.add_argument("--chunk", type=int, default=1, help="Chunk size")
-    parser.add_argument("--device", type=int, default=0, help="Chunk size")
+    parser.add_argument("--device", type=int, default=0, help="Device to be used")
 
     args = parser.parse_args()
 
