@@ -10,7 +10,10 @@ Dependencies:
 + pandas
 + h5py
 
-
+Setup using conda:
+```
+conda env create -f environment.yml
+```
 ##  Source codes:
 + SCNet.py: SC-LSTM model file
 + datasets.py: Generate training datatset
@@ -21,7 +24,7 @@ Dependencies:
 ## Run
 
 ````
-    python train.py --window [window size] --chunk [chunk size] --device 0
+python train.py --window [window size] --chunk [chunk size] --device 0
 ````
 + window (required): Window size should be [1, 2, 5, 10, 20].
 + chunk (required): Chunk size should be [1, 2, 5, 10, 20, 10000].
