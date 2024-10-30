@@ -1,6 +1,6 @@
 # Enhancing Automated Seizure Detection via Self-Calibrating Spatial-Temporal EEG Features with SC-LSTM
 ## Model architecture
-![image](https://github.com/NENUBioCompute/TopoPharmDTI/blob/main/Figure/Model%20architecture.png)
+![image](https://github.com/Ivan020121/EpilepsyEEG/blob/main/Figures/SC-SLTM.svg)
 
 ## Setup and dependencies
 dependencies:
