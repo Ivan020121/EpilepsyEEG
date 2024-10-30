@@ -31,4 +31,5 @@ python train.py --window [window size] --chunk [chunk size] --device 0
 + device (optional): Cuda device.
 ## Author
 Wenhao Li
+
 Guan Ning Lin
