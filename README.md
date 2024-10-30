@@ -3,7 +3,7 @@
 ![image](https://github.com/Ivan020121/EpilepsyEEG/blob/main/Figures/SC-SLTM.svg)
 
 ## Setup and dependencies
-dependencies:
+Dependencies:
 + python 3.9
 + pytorch >= 2.0.1
 + numpy
