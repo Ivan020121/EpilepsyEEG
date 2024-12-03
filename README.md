@@ -14,6 +14,10 @@ Setup using conda:
 ```
 conda env create -f environment.yml
 ```
+
+## Dataset
+Raw EDF files and CSV annotations files are available at https://drive.google.com/drive/folders/1y2A7-mKEG7qpw1Hh-RuDzKcJH71f2tN9?usp=drive_link. 
+
 ##  Source codes:
 + SCNet.py: SC-LSTM model file
 + datasets.py: Generate training datatset
