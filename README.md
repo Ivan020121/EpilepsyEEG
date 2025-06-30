@@ -9,6 +9,8 @@ Dependencies:
 + numpy
 + pandas
 + h5py
++ scipy
++ scikit-learn
 
 Setup using conda:
 ```
@@ -33,7 +35,23 @@ python train.py --window [window size] --chunk [chunk size] --device 0
 + window (required): Window size should be [1, 2, 5, 10, 20].
 + chunk (required): Chunk size should be [1, 2, 5, 10, 20, 10000].
 + device (optional): Cuda device.
+
+## Deployment
+### Server Dependency
++ fastapi\[standard\]
++ cachetools
++ matplotlib
++ scikit-learn
++ pyedflib
+
+````
+fastapi run server.py --no-reload --port [port]
+````
+
+
 ## Author
 Wenhao Li
+
+Liujinxiang Zhu
 
 Guan Ning Lin
