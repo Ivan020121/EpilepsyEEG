@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_2" data-name="图层 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 434.15 379.47">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#_未命名的渐变_5);
+      }
+
+      .cls-2 {
+        fill: url(#_未命名的渐变_43);
+      }
+
+      .cls-3 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        fill: #00a0e9;
+      }
+
+      .cls-4, .cls-5 {
+        stroke: #2ea7e0;
+      }
+
+      .cls-4, .cls-5, .cls-6 {
+        stroke-miterlimit: 10;
+      }
+
+      .cls-7 {
+        font-family: CaskaydiaCoveNFM-Regular, 'CaskaydiaCove Nerd Font Mono';
+        font-size: 60px;
+      }
+
+      .cls-5 {
+        fill: url(#_未命名的渐变_8);
+      }
+
+      .cls-8 {
+        fill: #231815;
+      }
+
+      .cls-9 {
+        fill: url(#_未命名的渐变_20);
+      }
+
+      .cls-10 {
+        fill: #13ae67;
+      }
+
+      .cls-11 {
+        fill: #008ed4;
+      }
+
+      .cls-6 {
+        fill: #003e97;
+        stroke: #00a0e9;
+        stroke-width: 2px;
+      }
+    </style>
+    <linearGradient id="_未命名的渐变_8" data-name="未命名的渐变 8" x1="216.66" y1="64.53" x2="217.48" y2="225.63" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0088d2"/>
+      <stop offset="1" stop-color="#13ae67"/>
+    </linearGradient>
+    <linearGradient id="_未命名的渐变_5" data-name="未命名的渐变 5" x1="217.07" y1="97.03" x2="217.07" y2="210.19" gradientUnits="userSpaceOnUse">
+      <stop offset=".18" stop-color="#5ab764"/>
+      <stop offset="1" stop-color="#216cb6"/>
+    </linearGradient>
+    <radialGradient id="_未命名的渐变_20" data-name="未命名的渐变 20" cx="217.07" cy="146.48" fx="217.07" fy="146.48" r="45.35" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#054a7d"/>
+      <stop offset="1" stop-color="#081732"/>
+    </radialGradient>
+    <radialGradient id="_未命名的渐变_43" data-name="未命名的渐变 43" cx="217.07" cy="146.48" fx="217.07" fy="146.48" r="25.51" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#42b2d8"/>
+      <stop offset="1" stop-color="#3dbee9"/>
+    </radialGradient>
+  </defs>
+  <g id="_图层_1-2" data-name="图层 1">
+    <line class="cls-6" y1="146.48" x2="75.4" y2="146.48"/>
+    <line class="cls-6" x1="358.75" y1="146.48" x2="434.15" y2="146.48"/>
+    <text class="cls-7" transform="translate(80.03 350.49)"><tspan class="cls-10" x="0" y="0">E</tspan><tspan class="cls-8" x="35.16" y="0">PI</tspan><tspan class="cls-11" x="105.47" y="0">S</tspan><tspan class="cls-8" x="140.62" y="0">IGHT</tspan></text>
+    <path class="cls-5" d="M75.34,146.19s57.56-86.89,141.73-85.31c84.17,1.58,141.73,85.31,141.73,85.31,0,0-64.26,85.53-141.73,84.74-77.47-.79-141.73-84.74-141.73-84.74Z"/>
+    <path class="cls-3" d="M75.34,146.1s57.56-60.82,141.73-59.72c84.17,1.11,141.73,59.72,141.73,59.72,0,0-64.26,59.87-141.73,59.32-77.47-.55-141.73-59.32-141.73-59.32Z"/>
+    <circle class="cls-1" cx="217.07" cy="146.23" r="53.86"/>
+    <circle class="cls-9" cx="217.07" cy="146.48" r="45.35"/>
+    <circle class="cls-2" cx="217.07" cy="146.48" r="25.51"/>
+    <circle class="cls-10" cx="356.08" cy="174.13" r="4.25"/>
+    <circle class="cls-10" cx="348.02" cy="200.72" r="4.25"/>
+    <circle class="cls-10" cx="334.92" cy="225.23" r="4.25"/>
+    <circle class="cls-10" cx="317.29" cy="246.7" r="4.25"/>
+    <circle class="cls-10" cx="295.82" cy="264.33" r="4.25"/>
+    <circle class="cls-10" cx="271.31" cy="277.43" r="4.25"/>
+    <circle class="cls-10" cx="244.73" cy="285.49" r="4.25"/>
+    <circle class="cls-10" cx="217.07" cy="288.22" r="4.25"/>
+    <circle class="cls-10" cx="189.42" cy="285.49" r="4.25"/>
+    <circle class="cls-10" cx="162.84" cy="277.43" r="4.25"/>
+    <circle class="cls-10" cx="138.33" cy="264.33" r="4.25"/>
+    <circle class="cls-10" cx="116.86" cy="246.7" r="4.25"/>
+    <circle class="cls-10" cx="99.23" cy="225.23" r="4.25"/>
+    <circle class="cls-10" cx="86.13" cy="200.72" r="4.25"/>
+    <circle class="cls-10" cx="78.07" cy="174.14" r="4.25"/>
+    <circle class="cls-4" cx="78.07" cy="118.83" r="4.25"/>
+    <circle class="cls-4" cx="86.13" cy="92.25" r="4.25"/>
+    <circle class="cls-4" cx="99.23" cy="67.74" r="4.25"/>
+    <circle class="cls-4" cx="116.86" cy="46.27" r="4.25"/>
+    <circle class="cls-4" cx="138.33" cy="28.64" r="4.25"/>
+    <circle class="cls-4" cx="162.84" cy="15.54" r="4.25"/>
+    <circle class="cls-4" cx="189.42" cy="7.48" r="4.25"/>
+    <circle class="cls-4" cx="217.07" cy="4.75" r="4.25"/>
+    <circle class="cls-4" cx="244.73" cy="7.48" r="4.25"/>
+    <circle class="cls-4" cx="348.02" cy="92.25" r="4.25"/>
+    <circle class="cls-4" cx="334.92" cy="67.74" r="4.25"/>
+    <circle class="cls-4" cx="271.31" cy="15.54" r="4.25"/>
+    <circle class="cls-4" cx="295.82" cy="28.64" r="4.25"/>
+    <circle class="cls-4" cx="317.29" cy="46.27" r="4.25"/>
+    <circle class="cls-4" cx="356.08" cy="118.83" r="4.25"/>
+  </g>
+</svg>

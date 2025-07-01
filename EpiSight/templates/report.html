@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Epilepsy Diagnosis Report</title>
+    <link rel="stylesheet" href="static/css/tailwind.min.css">
+    <link rel="stylesheet" href="static/css/all.min.css">
+    <link rel="stylesheet" href="static/css/styles.css">
+    <style>
+        /* 预留图表容器空间 */
+        .chart-container {
+            min-height: 300px;
+            position: relative;
+        }
+        
+        /* 固定尺寸的图片容器 */
+        .img-container {
+            width: 80px;
+            height: 70px;
+            background: #f0f4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 加载占位符 */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* 报告内容加载占位 */
+        #report-placeholder {
+            min-height: 800px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        /* 固定尺寸元素 */
+        .fixed-size {
+            contain: strict;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-blue-100 text-gray-800 min-h-screen flex flex-col text-lg">
+    <!-- 顶栏 -->
+    <header class="bg-white bg-opacity-80 backdrop-filter backdrop-blur-lg p-2 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <!-- 图片容器预留空间 -->
+                <div class="img-container mr-6">
+                    <img src="static/img/logo.svg" alt="Logo" width="80" height="70" 
+                         class="h-full w-full object-contain" loading="eager">
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-blue-600 pb-1">
+                    Epilepsy Diagnosis Report
+                </h1>
+            </div>
+            <button id="export-pdf" class="right-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 z-50 fixed-size">
+                <i class="fas fa-file-pdf mr-2"></i>Export PDF
+            </button>
+        </div>
+    </header>
+
+    <main class="container mx-auto flex-grow p-4 max-w-screen-xl">
+        <!-- 报告内容占位符 -->
+        <div id="report-placeholder" class="skeleton">
+            <!-- 骨架屏加载效果 -->
+            <div class="space-y-6">
+                <div class="h-12 bg-gray-200 rounded w-1/2 skeleton"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="h-64 bg-gray-200 rounded-lg skeleton"></div>
+                    <div class="h-64 bg-gray-200 rounded-lg skeleton"></div>
+                </div>
+                
+                <div class="h-96 bg-gray-200 rounded-lg skeleton"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="h-40 bg-gray-200 rounded skeleton"></div>
+                    <div class="h-40 bg-gray-200 rounded skeleton"></div>
+                    <div class="h-40 bg-gray-200 rounded skeleton"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 报告内容将由JS动态填充 -->
+        <div id="report-content" style="display: none;"></div>
+    </main>
+
+    <!-- 底栏 -->
+    <footer class="bg-black bg-opacity-70 backdrop-filter backdrop-blur-lg p-6 mt-8 fixed-size">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-gray-400">© 2025 EpiSight | v1.0.0</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition fixed-size"><i class="fab fa-github"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition fixed-size"><i class="fas fa-envelope"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition fixed-size"><i class="fas fa-question-circle"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回按钮 -->
+    <button id="back-button" class="fixed bottom-8 right-8 w-16 h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 z-50 fixed-size">
+        <i class="fas fa-arrow-left text-2xl"></i>
+    </button>
+    
+    <!-- 粒子特效 -->
+    <div id="particles-js" class="fixed top-0 left-0 w-full h-full z-[-1]"></div>
+    
+    <!-- 脚本引用 -->
+    <script src="static/js/particles.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js" defer="defer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js" defer="defer"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer="defer"></script>
+    <script src="static/js/pdf.js" defer="defer"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化返回按钮
+            document.getElementById('back-button').addEventListener('click', function() {
+                window.location.href = '/episight';
+            });
+            
+            // 模拟数据加载过程
+            setTimeout(function() {
+                renderReportContent();
+            }, 1500);
+        });
+        
+        // 渲染报告内容
+        function renderReportContent() {
+            const result = localStorage.getItem('analysisResult');
+            const placeholder = document.getElementById('report-placeholder');
+            const reportContent = document.getElementById('report-content');
+            
+            if (!result) {
+                placeholder.style.display = 'none';
+                reportContent.style.display = 'block';
+                reportContent.innerHTML = 
+                    '<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">' +
+                    '<p>The analysis results were not found. Please return and re-analyze the data.</p>' +
+                    '</div>';
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(result);
+                
+                // 渲染报告内容
+                let reportHTML = `
+                    <div class="bg-black bg-opacity-10 rounded-xl p-6 shadow-xl mb-8">
+                        <h2 class="text-3xl font-bold mb-6 text-center text-blue-600 border-b border-blue-500 pb-2">Diagnostic</h2>
+                        
+                        <!-- 诊断概览 -->
+                        <div class="mb-8">
+                            <p class="text-xl font-bold rounded mb-4 p-2 ${data.overview.seizure_duration > 0 ? 'text-red-600 border-l-4 border-red-500 pl-4 bg-red-50' : 'text-green-600 border-l-4 border-green-500 pl-4 bg-green-50'}">${data.overview.seizure_duration > 0 ? 'Epilepsy like discharges were observed in the patient\'s EEG.' : 'No epileptic discharges were observed in the patient\'s EEG.'}</p>
+                            
+                            <div class="bg-gray-100 bg-opacity-80 rounded-lg p-4 mb-4">
+                                <h3 class="text-2xl font-bold mb-2 text-blue-600">Duration Summary</h3>
+                                <div class="flex flex-col md:flex-row gap-4 items-center justify-center mx-auto">
+                                    <div class="w-full md:w-1/2 flex items-center">
+                                        <table class="text-lg w-full text-base text-center">
+                                            <thead>
+                                                <tr class="border-b border-gray-300">
+                                                    <th class="py-2">EEG Recording</th>
+                                                    <th class="py-2">Normal</th>
+                                                    <th class="py-2">Seizure</th>
+                                                    <th class="py-2">Single Seizure <br> Average/Max/Min</th>
+                                                    <th class="py-2">Seizure Ratio</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="py-2">${formatDuration(data.overview.normal_duration + data.overview.seizure_duration)}</td>
+                                                    <td class="py-2">${formatDuration(data.overview.normal_duration)}</td>
+                                                    <td class="py-2">${formatDuration(data.overview.seizure_duration)}</td>
+                                                    <td class="py-2">${formatDuration(data.overview.average_single_seizure_duration)}/${formatDuration(data.overview.max_single_seizure_duration)}/${formatDuration(data.overview.min_single_seizure_duration)}</td>
+                                                    <td class="py-2">${data.overview.seizure_ratio.toFixed(2)}%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="w-full md:w-1/2 chart-container">
+                                        <canvas id="seizureRatioChart" width="150" height="150"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-100 bg-opacity-80 rounded-lg p-4 chart-container">
+                                <h3 class="text-2xl font-bold mb-2 text-blue-600">Raw EEG Signal</h3>
+                                <p class="text-lg">The 1-second EEG segment illustrated below exhibits typical ictal epileptiform discharges</p>
+                                <!-- 绘制1秒EEG波形图 -->
+                                <canvas id="eegSegmentChart" width="100%" height="400"></canvas>
+                            </div>
+                                
+                        </div>
+                    </div>
+
+                    <div class="bg-black bg-opacity-10 rounded-xl p-6 shadow-xl mb-8">
+                        <h2 class="text-3xl font-bold mb-6 text-center text-blue-600 border-b border-blue-500 pb-2">Time Domain Analysis</h2>
+                        <!-- 时域分析 -->
+                        <div class="mb-8">
+                            <div class="bg-gray-100 bg-opacity-80 rounded-lg p-4">
+                                <h3 class="text-2xl font-bold mb-2 text-blue-600">Basic Time Domain Features</h3>
+                                <table class="text-lg w-full text-base text-center">
+                                    <thead>
+                                        <tr class="border-b border-gray-300 ">
+                                            <th class="py-2">Channel</th>
+                                            <th class="py-2">Mean</th>
+                                            <th class="py-2">Std</th>
+                                            <th class="py-2">Max</th>
+                                            <th class="py-2">Min</th>
+                                            <th class="py-2">Median</th>
+                                            <th class="py-2">Range</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${Object.entries(data.TimeDomainStats).map(([channel, values]) => `
+                                            <tr>
+                                                <td class="py-2">${channel}</td>
+                                                <td class="py-2">${values[0].toFixed(3)}</td>
+                                                <td class="py-2">${values[1].toFixed(3)}</td>
+                                                <td class="py-2">${values[2].toFixed(3)}</td>
+                                                <td class="py-2">${values[3].toFixed(3)}</td>
+                                                <td class="py-2">${values[4].toFixed(3)}</td>
+                                                <td class="py-2">${values[5].toFixed(3)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-black bg-opacity-10 rounded-xl p-6 shadow-xl mb-8">
+                        <h2 class="text-3xl font-bold mb-6 text-center text-blue-600 border-b border-blue-500 pb-2">Frequency Domain Analysis</h2>
+                        <!-- 频域分析 -->
+                        <div class="mb-8">
+                            <div class="bg-gray-100 bg-opacity-80 rounded-lg p-4">
+                                <h3 class="text-2xl font-bold mb-2 text-blue-600">Power Spectral Density</h3>
+                                <table class="text-lg w-full text-base text-center">
+                                    <thead>
+                                        <tr class="border-b border-gray-300">
+                                            <th class="py-2">Channel</th>
+                                            <th class="py-2">Total Power</th>
+                                            <th class="py-2">Delta</th>
+                                            <th class="py-2">Theta</th>
+                                            <th class="py-2">Alpha</th>
+                                            <th class="py-2">Beta</th>
+                                            <th class="py-2">Gamma</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${Object.entries(data.FrequencyStats).map(([channel, values]) => `
+                                            <tr>
+                                                <td class="py-2">${channel}</td>
+                                                <td class="py-2">${values[0].toFixed(3)}</td>
+                                                <td class="py-2">${values[1].toFixed(3)}</td>
+                                                <td class="py-2">${values[2].toFixed(3)}</td>
+                                                <td class="py-2">${values[3].toFixed(3)}</td>
+                                                <td class="py-2">${values[4].toFixed(3)}</td>
+                                                <td class="py-2">${values[5].toFixed(3)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="bg-gray-100 bg-opacity-80 rounded-lg p-4 mb-4 chart-container">   
+                                <!-- PSD Chart -->
+                                <div class="mb-4">
+                                    <h3 class="text-2xl font-bold mb-2 text-blue-600">Power Spectral Density (PSD)</h3>
+                                    <canvas id="psdChart" width="100%" height="400"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-gray-100 bg-opacity-80 rounded-lg p-4 mb-4 chart-container">   
+                                <!-- Frequency Band Power per Channel Chart -->
+                                <h3 class="text-2xl font-bold mb-2 text-blue-600">Frequency Band Power per Channel</h3>
+                                    <canvas id="FBPChart" width="100%" height="600"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-black bg-opacity-10 rounded-xl p-6 shadow-xl mb-8">
+                        <h2 class="text-3xl font-bold mb-6 text-center text-blue-600 border-b border-blue-500 pb-2">Signal Intensity Analysis</h2>
+                        <!-- 信号强度分析 -->
+                        <div class="mb-8">
+                            <div class="bg-gray-100 bg-opacity-80 rounded-lg p-4 mb-4">
+                                <h3 class="text-2xl font-bold mb-2 text-blue-600">RMS Average</h3>
+                                <table class="w-full text-base text-center">
+                                    <thead>
+                                        <tr class="text-lg border-b border-gray-300">
+                                            <th class="py-2">Overall RMS Mean Across Channels (μV)</th>
+                                            <th class="py-2">Overall RMS Std Across Channels (μV)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="py-2">${data.RMS[1].toFixed(3)}</td>
+                                            <td class="py-2">${data.RMS[2].toFixed(3)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                
+                                <canvas id="RMSAChart" width="100%" height="400"></canvas>
+                            </div>
+
+                            <div class="bg-gray-100 bg-opacity-80 rounded-lg p-4 chart-container">
+                                <h3 class="text-2xl font-bold mb-2 text-blue-600">RMS Amplitude Across Time</h3>
+                                <canvas id="RMSChart" width="100%" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-black bg-opacity-10 rounded-xl p-6 shadow-xl mb-8">
+                        <h2 class="text-3xl font-bold mb-6 text-center text-blue-600 border-b border-blue-500 pb-2">Statistical Analysis</h2>
+                        <!-- 统计分析 -->
+                        <div class="mb-8">
+                            <div class="bg-gray-100 bg-opacity-80 rounded-lg p-4 chart-container">
+                                <h3 class="text-2xl font-bold mb-2 text-blue-600">Channel Covariance</h3>
+                                <table class="text-lg w-full text-base text-center">
+                                    <thead>
+                                        <tr class="border-b border-gray-300">
+                                            <th class="py-2">Mean Covariance</th>
+                                            <th class="py-2">Max Covariance</th>
+                                            <th class="py-2">Min Covariance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="py-2">${data.Covariance[0].toFixed(3)}</td>
+                                            <td class="py-2">${data.Covariance[1].toFixed(3)}</td>
+                                            <td class="py-2">${data.Covariance[2].toFixed(3)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div id="outCC" style="width: 100%; height: 600px; display: flex;justify-content: center;align-items: center;"'>
+                                    <div id="CovarianceChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // 添加格式化时间函数
+                function formatDuration(seconds) {
+                    const hours = Math.floor(seconds / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+                    const secs = Math.floor(seconds % 60);
+                    return `${hours > 0 ? hours + 'h' : ''}${minutes > 0 ? minutes + 'm' : ''}${secs > 0 ? secs + 's' : ''}`;
+                }
+                
+                // 显示报告内容
+                placeholder.style.display = 'none';
+                reportContent.style.display = 'block';
+                reportContent.innerHTML = reportHTML;
+                
+                // 初始化图表
+                initializeCharts(data);
+                
+                // 导出PDF功能
+                document.getElementById('export-pdf').addEventListener('click', async function() {
+                    pdfMake.createPdf(await get_dd()).download("Epilepsy Diagnosis Report.pdf");
+                });
+                
+            } catch (e) {
+                placeholder.style.display = 'none';
+                reportContent.style.display = 'block';
+                reportContent.innerHTML = 
+                    '<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">' +
+                    '<p>解析分析结果时出错：' + e.message + '</p>' +
+                    '</div>';
+            }
+        }
+        
+        // 初始化所有图表
+        function initializeCharts(data) {
+            // seizureRatioChart
+            const ctx = document.getElementById('seizureRatioChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['seizure', 'normal'],
+                    datasets: [{
+                        data: [data.overview.seizure_ratio, 100 - data.overview.seizure_ratio],
+                        backgroundColor: ['#5ab2ec', '#fb7f9a'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 创建图表
+            const datasets = data.time_domain.signals.map((signal, i) => ({
+                label: data.channel_labels[i],
+                data: signal,
+                borderColor: `hsl(${i * 20}, 80%, 50%)`,
+                borderWidth: 1,
+                pointRadius: 0
+            }));
+            
+            // PSD Chart
+            const psdCtx = document.getElementById('psdChart').getContext('2d');
+            const psdDatasets = data.psd.psd_values.map((values, i) => ({
+                label: data.channel_labels[i],
+                data: values,
+                borderColor: `hsl(${i * 20}, 80%, 50%)`,
+                borderWidth: 1,
+                pointRadius: 0
+            }));
+            
+            new Chart(psdCtx, {
+                type: 'line',
+                data: {
+                    labels: data.psd.frequencies,
+                    datasets: psdDatasets
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Frequency (Hz)'
+                            }
+                        },
+                        y: {
+                            type: 'logarithmic',
+                            title: {
+                                display: true,
+                                text: 'PSD (μV²/Hz)'
+                            },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return `10^${Math.round(Math.log(value) / Math.log(10))}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const tmpLabel = ['', ...data.channel_labels];
+            new Chart(document.getElementById('eegSegmentChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: data.time_domain.time.map(t => t.toFixed(2)),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (s)'
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: tmpLabel.length,
+                            title: {
+                                display: true,
+                                text: 'Channel'
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value, index, values) {
+                                    return tmpLabel[Math.ceil(value)];
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // 频带功率堆叠柱状图
+            const fbpCtx = document.getElementById('FBPChart').getContext('2d');
+            const bandColors = [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)'
+            ];
+            
+            new Chart(fbpCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.channel_labels,
+                    datasets: Object.entries(data.band_power).map(([band, values], i) => ({
+                        label: band,
+                        data: values,
+                        backgroundColor: bandColors[i],
+                        borderColor: bandColors[i].replace('0.7', '1'),
+                        borderWidth: 1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Channel'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Power (μV²)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+
+            // RMS Average Chart
+            const rmsaCtx = document.getElementById('RMSAChart').getContext('2d');
+            new Chart(rmsaCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.channel_labels,
+                    datasets: [{
+                        label: 'RMS (μV)',
+                        data: data.RMS[0],
+                        backgroundColor: `hsl(200, 80%, 50%)`,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'RMS (μV)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Channel'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // RMS Chart
+            const rmsCtx = document.getElementById('RMSChart').getContext('2d');
+            new Chart(rmsCtx, {
+                type: 'line',
+                data: {
+                    labels: data.rms_amplitude.time.map(t => t.toFixed(2)),
+                    datasets: [{
+                        label: 'RMS (μV)',
+                        data: data.rms_amplitude.rms_values,
+                        borderColor: '#1f77b4',
+                        borderWidth: 2,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (s)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'RMS (μV)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 使用d3.js创建协方差热力图
+            const margin = {top: 30, right: 120, bottom: 60, left: 60};
+            const width = Math.min(600, (document.getElementById('outCC').clientWidth - margin.left - margin.right)*0.9);
+            const height = width - margin.top - margin.bottom;
+            
+            // 创建SVG容器
+            const svg = d3.select('#CovarianceChart')
+            .append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            // 创建颜色比例尺
+            const color = d3.scaleSequential(d3.interpolateBlues)
+                .domain([d3.min(data.Covariance[3].flat()), d3.max(data.Covariance[3].flat())]);
+            
+            // 创建x和y比例尺
+            const x = d3.scaleBand()
+                .range([0, width])
+                .domain(data.channel_labels)
+                .padding(0.05);
+            
+            const y = d3.scaleBand()
+                .range([height, 0])
+                .domain(data.channel_labels)
+                .padding(0.05);
+            
+            // 添加热力图单元格
+            svg.selectAll()
+                .data(data.Covariance[3].flatMap((row, i) => 
+                    row.map((value, j) => ({
+                        x: data.channel_labels[j], 
+                        y: data.channel_labels[i], 
+                        value: value
+                    }))
+                ))
+                .enter()
+                .append('rect')
+                .attr('x', d => x(d.x))
+                .attr('y', d => y(d.y))
+                .attr('width', x.bandwidth())
+                .attr('height', y.bandwidth())
+                .style('fill', d => color(d.value));
+            
+            // 添加x轴
+            svg.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+            
+            // 添加y轴
+            svg.append('g')
+                .call(d3.axisLeft(y));
+            
+            // 添加颜色图例
+            const legendWidth = 20;
+            const legendHeight = 400;
+            const legend = svg.append('g')
+                .attr('transform', `translate(${width + 40}, ${height/2 - legendHeight/2})`);
+            
+            // 创建图例渐变
+            const defs = svg.append('defs');
+            const linearGradient = defs.append('linearGradient')
+                .attr('id', 'legend-gradient')
+                .attr('x1', '0%')
+                .attr('x2', '0%')
+                .attr('y1', '100%')
+                .attr('y2', '0%');
+            
+            linearGradient.selectAll('stop')
+                .data(color.ticks().map((t, i, n) => ({offset: `${100*i/n.length}%`, color: color(t)})))
+                .enter().append('stop')
+                .attr('offset', d => d.offset)
+                .attr('stop-color', d => d.color);
+            
+            // 绘制图例矩形
+            legend.append('rect')
+                .attr('width', legendWidth)
+                .attr('height', legendHeight)
+                .style('fill', 'url(#legend-gradient)');
+            
+            // 添加图例刻度
+            const legendScale = d3.scaleLinear()
+                .range([legendHeight, 0])
+                .domain([d3.min(data.Covariance[3].flat()), d3.max(data.Covariance[3].flat())]);
+            
+            const legendAxis = d3.axisRight(legendScale)
+                .ticks(5);
+            
+            legend.append('g')
+                .attr('transform', `translate(${legendWidth}, 0)`)
+                .call(legendAxis);
+        }
+    </script>
+</body>
+</html>
